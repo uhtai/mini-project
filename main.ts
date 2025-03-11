@@ -108,7 +108,7 @@ function spawn_objects() {
 
 function update_distance_display() {
     let distance = Math.round(skier.y)
-    distance_display.setText(str(distance) + "m")
+    distance_display.setText(distance.toString() + "m")
     distance_display.top = 0
     distance_display.left = 0
 }
@@ -117,4 +117,5 @@ game.onUpdate(function tick() {
     move()
     spawn_objects()
     info.changeScoreBy(skier.vy / 100)
+    update_distance_display()
 })
