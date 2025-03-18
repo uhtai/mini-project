@@ -4,6 +4,7 @@ let Enemy = SpriteKind.Enemy
 let Jump = SpriteKind.create()
 let is_jumping = false
 let distance_display = textsprite.create("", 3, 0)
+let Gate = SpriteKind.create()
 let turn_angle_modifier = 9
 let new_obstacle_y_pos_trigger = 0
 let camera_offset = 0
@@ -28,9 +29,21 @@ sprites.onOverlap(Enemy, Enemy, function clear_overlapping_sprites(sprite: Sprit
 sprites.onOverlap(Jump, Enemy, function clear_overlapping_sprites(sprite: Sprite, other_sprite: Sprite) {
     other_sprite.destroy()
 })
+sprites.onOverlap(Enemy, Gate, function clear_overlapping_sprites(sprite: Sprite, other_sprite: Sprite) {
+    other_sprite.destroy()
+})
 sprites.onOverlap(Player, Enemy, function obstacle_hit(skier: Sprite, obstacle: Sprite) {
     if (is_jumping === false) {
         game.over(false)
+    }
+})
+sprites.onOverlap(Player, Gate, function go_through_gate(skier: Sprite, gate: Sprite) {
+    if (gate.image.equals(assets.image`gate green`)) {
+        return
+    }
+    if (spriteutils.distanceBetween(skier, gate) < 16) {
+        gate.setImage(assets.image`gate green`)
+        info.changeScoreBy(200)
     }
 })
 sprites.onOverlap(Player, Jump, function player_jump(skier: Sprite, ski_jump: Sprite) {
@@ -88,6 +101,13 @@ function move() {
     skier.vy = Math.constrain(skier.vy, 20, 150)
 }
 
+function spawn_gate() {
+    let gate = sprites.create(assets.image`gate red`, Gate)
+    gate.x = randint(0, 160)
+    gate.top = scene.cameraProperty(CameraProperty.Bottom)
+    gate.setFlag(SpriteFlag.AutoDestroy, true)
+}
+
 function spawn_obstacle() {
     let obstacle = sprites.create(obstacle_assets._pickRandom(), Enemy)
     obstacle.x = randint(0, 160)
@@ -103,6 +123,9 @@ function spawn_objects() {
     }
     if (randint(1, 100) == 1) {
         spawn_ski_jump()
+    }
+    if (randint(1, 100) == 1) {
+        spawn_gate()
     }
 }
 
